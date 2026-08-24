@@ -17,9 +17,8 @@ Run:
 import flwr as fl
 
 # Minimum number of clients that must connect before a round starts.
-# For Day 5 testing, keep this low (1) so you can test with a single client
-# before scaling to 3 "hospitals" in Day 6.
-MIN_CLIENTS = 1
+# Day 6: set to 3 to simulate the 3 mock "hospital" nodes from the project brief.
+MIN_CLIENTS = 3  # Day 6: now require all 3 mock "hospital" nodes to connect before training starts
 NUM_ROUNDS = 3  # how many federated learning rounds to run
 
 
