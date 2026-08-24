@@ -1,0 +1,44 @@
+{
+  "name": "FakeBrainTumour",
+  "description": "Synthetic placeholder data for pipeline testing only",
+  "tensorImageSize": "4D",
+  "modality": {
+    "0": "FLAIR",
+    "1": "T1w",
+    "2": "T1gd",
+    "3": "T2w"
+  },
+  "labels": {
+    "0": "background",
+    "1": "tumor"
+  },
+  "numTraining": 6,
+  "numTest": 0,
+  "training": [
+    {
+      "image": "./imagesTr/BRATS_fake_000.nii.gz",
+      "label": "./labelsTr/BRATS_fake_000.nii.gz"
+    },
+    {
+      "image": "./imagesTr/BRATS_fake_001.nii.gz",
+      "label": "./labelsTr/BRATS_fake_001.nii.gz"
+    },
+    {
+      "image": "./imagesTr/BRATS_fake_002.nii.gz",
+      "label": "./labelsTr/BRATS_fake_002.nii.gz"
+    },
+    {
+      "image": "./imagesTr/BRATS_fake_003.nii.gz",
+      "label": "./labelsTr/BRATS_fake_003.nii.gz"
+    },
+    {
+      "image": "./imagesTr/BRATS_fake_004.nii.gz",
+      "label": "./labelsTr/BRATS_fake_004.nii.gz"
+    },
+    {
+      "image": "./imagesTr/BRATS_fake_005.nii.gz",
+      "label": "./labelsTr/BRATS_fake_005.nii.gz"
+    }
+  ],
+  "test": []
+}
