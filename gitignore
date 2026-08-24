@@ -1,0 +1,28 @@
+# Datasets — too large for git, and shouldn't contain patient data anyway
+data/
+*.nii.gz
+*.tar
+
+# Trained model weights — large binary files, don't belong in git history
+*.pth
+*.pt
+*.ckpt
+
+# Generated outputs
+sample_check.png
+*.png
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+
+# Environment / secrets
+.env
+
+# OS/editor junk
+.DS_Store
+.vscode/
+*.log

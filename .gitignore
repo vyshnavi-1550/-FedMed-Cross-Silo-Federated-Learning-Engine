@@ -1,0 +1,17 @@
+data/
+*.nii.gz
+*.tar
+*.pth
+*.pt
+*.ckpt
+sample_check.png
+*.png
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+.env
+.DS_Store
+.vscode/
+*.log
