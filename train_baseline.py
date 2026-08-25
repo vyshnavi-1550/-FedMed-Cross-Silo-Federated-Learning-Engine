@@ -30,7 +30,7 @@ from monai.transforms import Compose, Activations, AsDiscrete
 
 from data_pipeline import get_train_dataloader, PATCH_SIZE
 
-NUM_EPOCHS = 20        # small for fast iteration; increase for a real baseline run
+NUM_EPOCHS = 15        # meaningful baseline run on a real subset of patients
 LEARNING_RATE = 1e-3
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -78,6 +78,9 @@ def main():
             optimizer.step()
 
             epoch_loss += loss.item()
+
+            if step % 5 == 0 or step == 1:
+                print(f"  epoch {epoch}, step {step}/{len(train_loader)} — loss: {loss.item():.4f}")
 
         epoch_loss /= step
 

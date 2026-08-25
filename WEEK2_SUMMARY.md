@@ -46,13 +46,29 @@ over the TLS-encrypted connection, with identical training behavior to the
 unencrypted version — confirming TLS is transparent to the ML logic and
 adds security without breaking functionality.
 
-## Important caveat (carried over from Week 1)
+## Important caveat (carried over from Week 1) — RESOLVED
 
-All training this week was still on the **synthetic dataset** — the real
-BraTS/Decathlon download has not completed (slow network). The mechanism
-(partitioning, local training, aggregation, encryption) is fully proven;
-the actual Dice score numbers are not yet meaningful and should be
-re-validated once real data is available.
+~~All training this week was still on the synthetic dataset~~ **UPDATE:** the
+real BraTS dataset (388 patients) finished downloading and was successfully
+integrated. A real Federated Audit was completed using 100 real patients:
+
+| | Dice Score |
+|---|---|
+| Centralized baseline (100 real patients, 15 epochs) | **0.4972** |
+| Federated (3 hospitals, same 100 patients, FedAvg, 5 rounds) | **0.4536** |
+
+The federated model reached ~91% of the centralized baseline's accuracy
+**without any hospital ever sharing raw patient data** — only model weights
+were exchanged, and only over a TLS-encrypted channel. This satisfies the
+Mid-Project Review's "Federated Audit" requirement.
+
+Note: an early bug was found and fixed during this process — the federated
+client was initially pulling from a stale synthetic `dataset.json` left over
+from earlier testing (via `get_synthetic_datalist`) instead of the real
+100-patient list. Fixed by adding `get_federated_datalist()` to
+`data_pipeline.py`, which builds the datalist from the same real
+`DecathlonDataset` source as the baseline, then partitions it across
+hospitals.
 
 ## Not yet started (later weeks' scope, per original plan)
 

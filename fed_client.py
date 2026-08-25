@@ -29,8 +29,7 @@ from monai.transforms import Compose, Activations, AsDiscrete
 import flwr as fl
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "baseline"))
-from dataset import get_synthetic_datalist  # noqa: E402
-from data_pipeline import get_train_transforms, PATCH_SIZE  # noqa: E402
+from data_pipeline import get_train_transforms, get_federated_datalist  # noqa: E402
 from fed_utils import build_model, get_model_parameters, set_model_parameters, DEVICE
 
 LOCAL_EPOCHS = 2  # epochs of LOCAL training per federated round (keep small -- this runs every round)
@@ -43,10 +42,10 @@ class FedMedClient(fl.client.NumPyClient):
         self.client_id = client_id
         self.model = build_model()
 
-        # Each hospital only loads ITS OWN slice of the data -- this is the
-        # simulated data silo. In a real deployment this would simply be
-        # "load whatever data is on this hospital's own server."
-        datalist = get_synthetic_datalist(client_id=client_id, num_clients=NUM_CLIENTS)
+        # Each hospital only loads ITS OWN slice of the REAL data -- this is
+        # the simulated data silo, built from the same real patient list
+        # your baseline training uses (not the separate synthetic dataset.json).
+        datalist = get_federated_datalist(client_id=client_id, num_clients=NUM_CLIENTS)
         print(f"[Hospital {client_id}] Local dataset size: {len(datalist)} samples")
 
         dataset = Dataset(data=datalist, transform=get_train_transforms())

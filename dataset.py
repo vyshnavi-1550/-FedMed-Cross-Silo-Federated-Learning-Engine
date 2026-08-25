@@ -25,7 +25,7 @@ from monai.transforms import (
 )
 
 DATA_ROOT = "./data"  # dataset will be downloaded here (~7GB, be patient)
-USE_SYNTHETIC = False  # set True temporarily if the real download is too slow (see synthetic_data.py)
+USE_SYNTHETIC = False # set True temporarily if the real download is too slow (see synthetic_data.py)
 
 
 def get_transforms():

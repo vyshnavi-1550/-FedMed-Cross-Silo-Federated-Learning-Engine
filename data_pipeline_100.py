@@ -1,5 +1,5 @@
 """
-Day 3 -- Training-Time Data Pipeline
+Day 3 — Training-Time Data Pipeline
 
 Builds the transform pipeline actually used for TRAINING (as opposed to
 Day 2's viewing-only pipeline). The key addition is RandCropByPosNegLabeld,
@@ -34,7 +34,7 @@ from monai.transforms import (
 )
 
 DATA_ROOT = "./data"
-USE_SYNTHETIC = False  # now using the REAL BraTS dataset -- synthetic data is no longer needed
+USE_SYNTHETIC = False  # now using the REAL BraTS dataset — synthetic data is no longer needed
 PATCH_SIZE = (32, 32, 16)  # smaller than full volume -- adjust down further if synthetic volumes are small
 BATCH_SIZE = 2
 MAX_SAMPLES = 100  # set to a small number (e.g. 20) to quickly test on a subset before a full run
@@ -69,6 +69,33 @@ def get_train_transforms():
     )
 
 
+def get_federated_datalist(client_id, num_clients=3):
+    """Builds the REAL 100-patient datalist (same source as the baseline
+    training) and splits it across hospitals for federated training.
+
+    This replaces the old approach of pulling from the separate synthetic
+    dataset.json file, which could silently contain stale fake data left
+    over from earlier testing.
+    """
+    full_dataset = DecathlonDataset(
+        root_dir=DATA_ROOT,
+        task="Task01_BrainTumour",
+        section="training",
+        transform=None,  # just need the file list here, not the transforms
+        download=True,
+        cache_rate=0.0,
+        num_workers=0,
+    )
+    datalist = full_dataset.data
+    if MAX_SAMPLES is not None:
+        datalist = datalist[:MAX_SAMPLES]
+
+    print(f"[get_federated_datalist] Real patients available for federated split: {len(datalist)}")
+    partition = datalist[client_id - 1 :: num_clients]
+    print(f"[get_federated_datalist] Hospital {client_id} assigned {len(partition)} real patients.")
+    return partition
+
+
 def get_synthetic_datalist():
     task_dir = os.path.join(DATA_ROOT, "Task01_BrainTumour")
     json_path = os.path.join(task_dir, "dataset.json")
@@ -83,37 +110,6 @@ def get_synthetic_datalist():
         }
         for entry in meta["training"]
     ]
-
-
-def get_federated_datalist(client_id, num_clients, max_samples=100):
-    """
-    Returns this hospital's partition of the SAME real BraTS dataset used by
-    train_baseline.py -- NOT the separate get_synthetic_datalist() json file,
-    which may still contain stale/small data from earlier pipeline testing.
-    This guarantees the federated Dice score is genuinely comparable to your
-    centralized baseline.
-
-    - Builds a DecathlonDataset the same way get_train_dataloader() does.
-    - Slices to the first `max_samples` real patients (matches MAX_SAMPLES
-      used for the baseline run).
-    - Splits that real patient list evenly across `num_clients` simulated
-      hospitals (e.g. ~33-34 patients each for 3 hospitals, out of 100).
-    """
-    ds = DecathlonDataset(
-        root_dir=DATA_ROOT,
-        task="Task01_BrainTumour",
-        section="training",
-        transform=Compose([]),  # no-op -- we only need the file list here, not the images
-        download=True,
-        cache_rate=0.0,
-        num_workers=0,
-    )
-    full_datalist = ds.data[:max_samples]
-    print(f"[get_federated_datalist] Real patients available for federated split: {len(full_datalist)}")
-
-    client_datalist = full_datalist[client_id - 1 :: num_clients]
-    print(f"[get_federated_datalist] Hospital {client_id} assigned {len(client_datalist)} real patients.")
-    return client_datalist
 
 
 def get_train_dataloader():
