@@ -25,7 +25,7 @@ from monai.transforms import (
 )
 
 DATA_ROOT = "./data"  # dataset will be downloaded here (~7GB, be patient)
-USE_SYNTHETIC = True  # set True temporarily if the real download is too slow (see synthetic_data.py)
+USE_SYNTHETIC = False  # set True temporarily if the real download is too slow (see synthetic_data.py)
 
 
 def get_transforms():
@@ -45,8 +45,10 @@ def get_transforms():
     )
 
 
-def get_synthetic_datalist():
-    """Load the file list from the synthetic dataset.json (run synthetic_data.py first)."""
+def get_synthetic_datalist(client_id=None, num_clients=3):
+    """Load the file list from the synthetic dataset.json.
+    If client_id is given, partitions the data so each hospital only sees
+    its own slice -- this simulates data silos (no hospital sees another's data)."""
     task_dir = os.path.join(DATA_ROOT, "Task01_BrainTumour")
     json_path = os.path.join(task_dir, "dataset.json")
     if not os.path.exists(json_path):
@@ -55,7 +57,6 @@ def get_synthetic_datalist():
         )
     with open(json_path) as f:
         meta = json.load(f)
-    # dataset.json stores relative paths like "./imagesTr/xxx.nii.gz" -> resolve to absolute
     datalist = []
     for entry in meta["training"]:
         datalist.append(
@@ -64,6 +65,14 @@ def get_synthetic_datalist():
                 "label": os.path.join(task_dir, entry["label"].lstrip("./")),
             }
         )
+
+    if client_id is not None:
+        # Simple partition: split the file list into num_clients roughly-equal
+        # chunks, and give this hospital only its own chunk. In a real deployment
+        # each hospital's data physically lives on their own machine -- this
+        # partitioning is just how we SIMULATE that on one machine for testing.
+        datalist = datalist[client_id - 1 :: num_clients]
+
     return datalist
 
 
